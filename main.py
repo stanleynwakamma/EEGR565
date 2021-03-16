@@ -1,4 +1,4 @@
-from lectures import lecture2
+from lectures import lecture5
 
 if __name__ == '__main__':
-    lecture2.lecture()
+    lecture5.lecture()
