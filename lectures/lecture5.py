@@ -29,4 +29,31 @@ def lecture():
     cols = df.columns[:30] # First 30 columns
     colors = ['#000099', '#ffff00'] # Specify the colors - yellow is missing
     sns.heatmap(df[cols].isnull(), cmap=sns.color_palette(colors))
+    # plt.show()
+
+    # Technique 2: Missing Data percentage list
+    missing_data = [(col, round(np.mean(df[col].isnull())*100)) for col in df.columns]
+    missing_data = sorted(missing_data, key=lambda x: x[1], reverse=True)
+    for data in missing_data:
+        if (data[1] == 0):
+            break
+        print('{} - {}%'.format(data[0], data[1]))
+
+    # Technique 3:
+    # first create missing indicator for features with missing data
+    for col in df.columns:
+        missing = df[col].isnull()
+        num_missing = np.sum(missing)
+
+        if num_missing > 0:
+            df['{}_ismissing'.format(col)] = missing
+
+    # then bassed on the indicator, plot the histogram of missing values
+    ismissing_cols = [col for col in df.columns if 'ismissing' in col]
+    df['num_missing'] = df[ismissing_cols].sum(axis=1)
+    df['num_missing'].value_counts().reset_index().sort_values(by='index').plot.bar(x='index', y='num_missing')
     plt.show()
+
+    # drop rows with a lot of missing values
+    ind_missing = df[df['num_missing'] > 35].index
+    df_less_missing_rows = df.drop(ind_missing, axis=0)
